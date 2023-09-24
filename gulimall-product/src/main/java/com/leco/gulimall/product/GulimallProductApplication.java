@@ -1,8 +1,8 @@
 package com.leco.gulimall.product;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * 1、整合MyBatis-Plus
@@ -21,7 +21,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *              2）、告诉MyBatis-Plus，sql映射文件位置
  */
 
-@MapperScan("com.leco.gulimall.product.dao")
+//@MapperScan("com.leco.gulimall.product.dao")
+@EnableDiscoveryClient
 @SpringBootApplication
 public class GulimallProductApplication {
 
