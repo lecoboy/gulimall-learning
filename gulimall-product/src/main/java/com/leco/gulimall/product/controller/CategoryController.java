@@ -58,6 +58,12 @@ public class CategoryController {
         return R.ok();
     }
 
+    @PutMapping("/update/sort")
+    public R updateSort(@RequestBody List<CategoryEntity> categories) {
+        categoryService.updateBatchById(categories);
+        return R.ok();
+    }
+
     /**
      * 修改
      */

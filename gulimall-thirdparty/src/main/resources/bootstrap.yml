@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: gulimall-thirdparty
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        namespace: 8cc30513-ffa9-4ef0-acdd-81998a67da66
+        file-extension: yml
+        ext-config:
+          - data-id: oss.yml
+            refresh: true
+          - data-id: test.yml
+            refresh: true
