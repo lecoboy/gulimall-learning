@@ -23,7 +23,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 //@MapperScan("com.leco.gulimall.product.dao")
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.leco.gulimall"})
 public class GulimallProductApplication {
 
     public static void main(String[] args) {
