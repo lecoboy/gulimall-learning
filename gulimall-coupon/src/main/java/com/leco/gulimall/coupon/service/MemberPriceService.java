@@ -1,7 +1,7 @@
 package com.leco.gulimall.coupon.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.leco.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.coupon.entity.MemberPriceEntity;
 
 import java.util.Map;

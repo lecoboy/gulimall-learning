@@ -6,12 +6,12 @@
  * 版权所有，侵权必究！
  */
 
-package com.leco.common.utils;
+package com.leco.gulimall.common.utils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.leco.common.xss.SQLFilter;
+import com.leco.gulimall.common.xss.SQLFilter;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;

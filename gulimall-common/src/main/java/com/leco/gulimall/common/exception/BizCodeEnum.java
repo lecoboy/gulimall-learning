@@ -1,9 +1,9 @@
-package com.leco.common.exception;
+package com.leco.gulimall.common.exception;
 
 public enum BizCodeEnum {
 
-    UNKNOW_EXCEPTION(10000,"系统未知异常"),
-    VAILD_EXCEPTION(10001,"参数格式校验失败"),
+    UNKNOW_EXCEPTION(10000, "系统未知异常"),
+    VAILD_EXCEPTION(10001, "参数格式校验失败"),
     ;
 
     private Integer code;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.leco.gulimall.product.entity.CategoryEntity;
 import com.leco.gulimall.product.service.CategoryService;
-import com.leco.common.utils.R;
+import com.leco.gulimall.common.utils.R;
 
 
 

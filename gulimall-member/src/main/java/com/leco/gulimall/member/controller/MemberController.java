@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.leco.gulimall.member.entity.MemberEntity;
 import com.leco.gulimall.member.service.MemberService;
-import com.leco.common.utils.PageUtils;
-import com.leco.common.utils.R;
+import com.leco.gulimall.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.R;
 
 
 

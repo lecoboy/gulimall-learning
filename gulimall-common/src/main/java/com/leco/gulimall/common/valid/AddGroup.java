@@ -1,4 +1,4 @@
-package com.leco.common.valid;
+package com.leco.gulimall.common.valid;
 
 /**
  * @author greg

@@ -1,4 +1,4 @@
-package com.leco.common.valid;
+package com.leco.gulimall.common.valid;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.leco.gulimall.coupon.entity.SkuFullReductionEntity;
 import com.leco.gulimall.coupon.service.SkuFullReductionService;
-import com.leco.common.utils.PageUtils;
-import com.leco.common.utils.R;
+import com.leco.gulimall.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.R;
 
 
 

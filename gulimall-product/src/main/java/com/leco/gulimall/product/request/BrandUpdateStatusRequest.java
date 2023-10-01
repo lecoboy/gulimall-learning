@@ -1,6 +1,6 @@
 package com.leco.gulimall.product.request;
 
-import com.leco.common.valid.ListValue;
+import com.leco.gulimall.common.valid.ListValue;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

@@ -2,16 +2,14 @@ package com.leco.gulimall.product.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.leco.common.utils.PageUtils;
-import com.leco.common.utils.Query;
+import com.leco.gulimall.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.Query;
 
 import com.leco.gulimall.product.dao.CategoryDao;
 import com.leco.gulimall.product.entity.CategoryEntity;
@@ -49,6 +47,25 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void removeCategoriesByIds(List<Long> ids) {
         //TODO 检查当前删除的分类，是否被别的地方引用
         baseMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> path = new ArrayList<>();
+        //递归查询是否还有父节点
+        findParentPath(catelogId, path);
+        return path.toArray(new Long[0]);
+    }
+
+    private void findParentPath(Long catelogId, List<Long> path) {
+        //根据当前分类id查询信息
+        CategoryEntity byId = this.getById(catelogId);
+        //如果当前不是父分类
+        if (byId.getParentCid() != 0) {
+            findParentPath(byId.getParentCid(), path);
+        }
+
+        path.add(catelogId);
     }
 
     //递归查找所有菜单的子菜单

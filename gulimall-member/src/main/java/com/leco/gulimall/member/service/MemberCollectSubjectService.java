@@ -1,7 +1,7 @@
 package com.leco.gulimall.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.leco.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.member.entity.MemberCollectSubjectEntity;
 
 import java.util.Map;

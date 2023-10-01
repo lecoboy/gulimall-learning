@@ -2,8 +2,8 @@ package com.leco.gulimall.product.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.leco.common.valid.AddGroup;
-import com.leco.common.valid.UpdateGroup;
+import com.leco.gulimall.common.valid.AddGroup;
+import com.leco.gulimall.common.valid.UpdateGroup;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 

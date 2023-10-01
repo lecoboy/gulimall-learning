@@ -1,7 +1,7 @@
 package com.leco.gulimall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.leco.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.product.entity.CategoryEntity;
 
 import java.util.List;
@@ -21,5 +21,7 @@ public interface CategoryService extends IService<CategoryEntity> {
     List<CategoryEntity> listWithTree();
 
     void removeCategoriesByIds(List<Long> ids);
+
+    Long[] findCatelogPath(Long catelogId);
 }
 

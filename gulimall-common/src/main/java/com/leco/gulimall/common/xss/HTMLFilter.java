@@ -1,4 +1,4 @@
-package com.leco.common.xss;
+package com.leco.gulimall.common.xss;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

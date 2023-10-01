@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.leco.gulimall.ware.entity.WareSkuEntity;
 import com.leco.gulimall.ware.service.WareSkuService;
-import com.leco.common.utils.PageUtils;
-import com.leco.common.utils.R;
+import com.leco.gulimall.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.R;
 
 
 

@@ -1,6 +1,6 @@
 package com.leco.gulimall.member.feign;
 
-import com.leco.common.utils.R;
+import com.leco.gulimall.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 

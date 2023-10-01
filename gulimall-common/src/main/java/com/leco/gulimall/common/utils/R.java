@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.leco.common.utils;
+package com.leco.gulimall.common.utils;
 
 import org.apache.http.HttpStatus;
 

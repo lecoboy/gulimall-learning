@@ -6,7 +6,7 @@
  * 版权所有，侵权必究！
  */
 
-package com.leco.common.exception;
+package com.leco.gulimall.common.exception;
 
 /**
  * 自定义异常

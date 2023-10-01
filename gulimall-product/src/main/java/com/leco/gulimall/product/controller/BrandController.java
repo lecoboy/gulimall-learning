@@ -1,9 +1,9 @@
 package com.leco.gulimall.product.controller;
 
-import com.leco.common.utils.PageUtils;
-import com.leco.common.utils.R;
-import com.leco.common.valid.AddGroup;
-import com.leco.common.valid.UpdateGroup;
+import com.leco.gulimall.common.utils.PageUtils;
+import com.leco.gulimall.common.utils.R;
+import com.leco.gulimall.common.valid.AddGroup;
+import com.leco.gulimall.common.valid.UpdateGroup;
 import com.leco.gulimall.product.entity.BrandEntity;
 import com.leco.gulimall.product.request.BrandUpdateStatusRequest;
 import com.leco.gulimall.product.service.BrandService;
