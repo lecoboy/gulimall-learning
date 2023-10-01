@@ -1,6 +1,7 @@
 package com.leco.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leco.gulimall.common.utils.PageUtils;
@@ -52,6 +53,18 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
         // 保存到数据库中
         this.save(categoryBrandRelation);
+    }
+
+    @Override
+    public void updateBrand(Long brandId, String name) {
+        CategoryBrandRelationEntity relationEntity = new CategoryBrandRelationEntity();
+        relationEntity.setBrandName(name);
+        this.update(relationEntity, new UpdateWrapper<CategoryBrandRelationEntity>().eq("brand_id", brandId));
+    }
+
+    @Override
+    public void updateCategory(Long catId, String name) {
+        this.baseMapper.updateCategory(catId,name);
     }
 
 }

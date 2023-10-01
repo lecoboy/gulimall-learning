@@ -58,7 +58,7 @@ public class CategoryController {
         return R.ok();
     }
 
-    @PutMapping("/update/sort")
+    @PostMapping("/update/sort")
     public R updateSort(@RequestBody List<CategoryEntity> categories) {
         categoryService.updateBatchById(categories);
         return R.ok();
@@ -67,10 +67,10 @@ public class CategoryController {
     /**
      * 修改
      */
-    @PutMapping("/update")
+    @PostMapping("/update")
     //@RequiresPermissions("product:category:update")
     public R update(@RequestBody CategoryEntity category){
-		categoryService.updateById(category);
+        categoryService.updateCascade(category);
 
         return R.ok();
     }
