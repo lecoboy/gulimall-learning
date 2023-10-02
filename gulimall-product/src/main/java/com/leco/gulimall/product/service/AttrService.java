@@ -3,6 +3,7 @@ package com.leco.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.product.entity.AttrEntity;
+import com.leco.gulimall.product.vo.AttrGroupRelationVO;
 import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 
@@ -29,5 +30,7 @@ public interface AttrService extends IService<AttrEntity> {
     void updateAttrById(AttrVO attr);
 
     List<AttrEntity> getRelationAttr(Long attrgroupId);
+
+    void deleteRelation(AttrGroupRelationVO[] vos);
 }
 

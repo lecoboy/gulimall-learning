@@ -7,6 +7,7 @@ import java.util.Map;
 import com.leco.gulimall.product.entity.AttrEntity;
 import com.leco.gulimall.product.service.AttrService;
 import com.leco.gulimall.product.service.CategoryService;
+import com.leco.gulimall.product.vo.AttrGroupRelationVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -109,6 +110,15 @@ public class AttrGroupController {
     //@RequiresPermissions("product:attrgroup:delete")
     public R delete(@RequestBody Long[] attrGroupIds){
 		attrGroupService.removeByIds(Arrays.asList(attrGroupIds));
+
+        return R.ok();
+    }
+
+    ///product/attrgroup/attr/relation/delete
+    @PostMapping(value = "/attr/relation/delete")
+    public R deleteRelation(@RequestBody AttrGroupRelationVO[] vos) {
+
+        attrService.deleteRelation(vos);
 
         return R.ok();
     }

@@ -16,6 +16,7 @@ import com.leco.gulimall.product.service.AttrAttrgroupRelationService;
 import com.leco.gulimall.product.service.AttrGroupService;
 import com.leco.gulimall.product.service.AttrService;
 import com.leco.gulimall.product.service.CategoryService;
+import com.leco.gulimall.product.vo.AttrGroupRelationVO;
 import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -195,6 +197,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
 
         return this.baseMapper.selectBatchIds(attrIds);
+    }
+
+    @Override
+    public void deleteRelation(AttrGroupRelationVO[] vos) {
+        List<AttrAttrgroupRelationEntity> entities = Arrays.stream(vos).map((item) -> {
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            BeanUtils.copyProperties(item, relationEntity);
+            return relationEntity;
+        }).collect(Collectors.toList());
+
+        relationService.deleteBatchRelation(entities);
     }
 
 }
