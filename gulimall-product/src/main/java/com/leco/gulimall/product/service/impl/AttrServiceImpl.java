@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.leco.gulimall.common.constant.ProductConstant;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.Query;
 import com.leco.gulimall.product.dao.AttrDao;
@@ -67,7 +68,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     public PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId, String attrType) {
         QueryWrapper<AttrEntity> queryWrapper = new QueryWrapper<AttrEntity>()
                 .eq("attr_type", "base".equalsIgnoreCase(attrType) ?
-                        1 : 0);
+                        ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode() : ProductConstant.AttrEnum.ATTR_TYPE_SALE.getCode());
 
         //根据catelogId查询信息
         if (catelogId != 0) {
@@ -126,10 +127,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
         //查询分组信息
         AttrRespVO respVo = new AttrRespVO();
-        BeanUtils.copyProperties(attrEntity,respVo);
+        BeanUtils.copyProperties(attrEntity, respVo);
 
         //判断是否是基本类型
-        if (attrEntity.getAttrType() == 1) {
+        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
             //1、设置分组信息
             AttrAttrgroupRelationEntity relationEntity = relationService.getOne(
                     (new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId)));
@@ -160,11 +161,11 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     @Override
     public void updateAttrById(AttrVO attr) {
         AttrEntity attrEntity = new AttrEntity();
-        BeanUtils.copyProperties(attr,attrEntity);
+        BeanUtils.copyProperties(attr, attrEntity);
 
         this.updateById(attrEntity);
 
-        if (attrEntity.getAttrType() == 1) {
+        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.ATTR_TYPE_BASE.getCode()) {
             //1、修改分组关联
             AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
             relationEntity.setAttrGroupId(attr.getAttrGroupId());
@@ -174,7 +175,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
             if (count > 0) {
                 relationService.update(relationEntity,
-                        new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id",attr.getAttrId()));
+                        new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attr.getAttrId()));
             } else {
                 relationService.save(relationEntity);
             }
