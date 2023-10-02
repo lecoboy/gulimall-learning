@@ -116,4 +116,41 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return pageUtils;
     }
 
+    @Override
+    public AttrRespVO getAttrInfo(Long attrId) {
+        //查询详细信息
+        AttrEntity attrEntity = this.getById(attrId);
+
+        //查询分组信息
+        AttrRespVO respVo = new AttrRespVO();
+        BeanUtils.copyProperties(attrEntity,respVo);
+
+        //判断是否是基本类型
+        if (attrEntity.getAttrType() == 1) {
+            //1、设置分组信息
+            AttrAttrgroupRelationEntity relationEntity = relationService.getOne(
+                    (new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrId)));
+            if (relationEntity != null) {
+                respVo.setAttrGroupId(relationEntity.getAttrGroupId());
+                //获取分组名称
+                AttrGroupEntity attrGroupEntity = attrGroupService.getById(relationEntity.getAttrGroupId());
+                if (attrGroupEntity != null) {
+                    respVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                }
+            }
+        }
+
+        //2、设置分类信息
+        Long catelogId = attrEntity.getCatelogId();
+        Long[] catelogPath = categoryService.findCatelogPath(catelogId);
+
+        respVo.setCatelogPath(catelogPath);
+        CategoryEntity categoryEntity = categoryService.getById(catelogId);
+        if (categoryEntity != null) {
+            respVo.setCatelogName(categoryEntity.getName());
+        }
+
+        return respVo;
+    }
+
 }

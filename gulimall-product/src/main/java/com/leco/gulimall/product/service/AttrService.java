@@ -3,6 +3,7 @@ package com.leco.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.product.entity.AttrEntity;
+import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 
 import java.util.Map;
@@ -21,5 +22,7 @@ public interface AttrService extends IService<AttrEntity> {
     void saveAttr(AttrVO attr);
 
     PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId, String attrType);
+
+    AttrRespVO getAttrInfo(Long attrId);
 }
 

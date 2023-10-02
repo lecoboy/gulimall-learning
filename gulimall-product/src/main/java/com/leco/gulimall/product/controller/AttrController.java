@@ -4,6 +4,7 @@ import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.R;
 import com.leco.gulimall.product.entity.AttrEntity;
 import com.leco.gulimall.product.service.AttrService;
+import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +53,9 @@ public class AttrController {
     @RequestMapping("/info/{attrId}")
     //@RequiresPermissions("product:attr:info")
     public R info(@PathVariable("attrId") Long attrId) {
-        AttrEntity attr = attrService.getById(attrId);
+        AttrRespVO respVo = attrService.getAttrInfo(attrId);
 
-        return R.ok().put("attr", attr);
+        return R.ok().put("attr", respVo);
     }
 
     /**
