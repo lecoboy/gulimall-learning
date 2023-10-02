@@ -5,15 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.Query;
-import com.leco.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.leco.gulimall.product.dao.AttrDao;
-import com.leco.gulimall.product.dao.AttrGroupDao;
-import com.leco.gulimall.product.dao.CategoryDao;
 import com.leco.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.leco.gulimall.product.entity.AttrEntity;
 import com.leco.gulimall.product.entity.AttrGroupEntity;
 import com.leco.gulimall.product.entity.CategoryEntity;
+import com.leco.gulimall.product.service.AttrAttrgroupRelationService;
+import com.leco.gulimall.product.service.AttrGroupService;
 import com.leco.gulimall.product.service.AttrService;
+import com.leco.gulimall.product.service.CategoryService;
 import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 import org.apache.commons.lang.StringUtils;
@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements AttrService {
 
     @Resource
-    private AttrAttrgroupRelationDao relationDao;
+    private AttrAttrgroupRelationService relationService;
     @Resource
-    private AttrGroupDao attrGroupDao;
+    private AttrGroupService attrGroupService;
     @Resource
-    private CategoryDao categoryDao;
+    private CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -57,7 +57,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
         relationEntity.setAttrGroupId(attr.getAttrGroupId());
         relationEntity.setAttrId(attrEntity.getAttrId());
-        relationDao.insert(relationEntity);
+        relationService.save(relationEntity);
     }
 
     @Override
@@ -94,9 +94,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             //设置分组名
             if ("base".equalsIgnoreCase(attrType)) {
                 AttrAttrgroupRelationEntity relationEntity =
-                        relationDao.selectOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrEntity.getAttrId()));
+                        relationService.getOne(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrEntity.getAttrId()));
                 if (relationEntity != null && relationEntity.getAttrGroupId() != null) {
-                    AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(relationEntity.getAttrGroupId());
+                    AttrGroupEntity attrGroupEntity = attrGroupService.getById(relationEntity.getAttrGroupId());
                     //TODO 这里有个问题，分组和属性到底是多对多还是一对多？如果是多对多，那么这里就应该是个list；
                     // 如果是一对多，那么attr表里加上一个attrGroupId直接查即可。
                     attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
@@ -104,7 +104,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
 
             }
             // 设置分类名
-            CategoryEntity categoryEntity = categoryDao.selectById(attrEntity.getCatelogId());
+            CategoryEntity categoryEntity = categoryService.getById(attrEntity.getCatelogId());
             if (categoryEntity != null) {
                 attrRespVo.setCatelogName(categoryEntity.getName());
 
