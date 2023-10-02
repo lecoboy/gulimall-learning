@@ -6,6 +6,7 @@ import com.leco.gulimall.product.entity.AttrEntity;
 import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,5 +27,7 @@ public interface AttrService extends IService<AttrEntity> {
     AttrRespVO getAttrInfo(Long attrId);
 
     void updateAttrById(AttrVO attr);
+
+    List<AttrEntity> getRelationAttr(Long attrgroupId);
 }
 

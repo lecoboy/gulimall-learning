@@ -182,4 +182,19 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
     }
 
+    @Override
+    public List<AttrEntity> getRelationAttr(Long attrgroupId) {
+        List<AttrAttrgroupRelationEntity> entities = relationService.list
+                (new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", attrgroupId));
+
+        List<Long> attrIds = entities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+
+        //如果attrIds为空就直接返回一个null值出去
+        if (attrIds.size() == 0) {
+            return null;
+        }
+
+        return this.baseMapper.selectBatchIds(attrIds);
+    }
+
 }
