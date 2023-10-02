@@ -3,6 +3,7 @@ package com.leco.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.product.entity.AttrAttrgroupRelationEntity;
+import com.leco.gulimall.product.vo.AttrGroupRelationVO;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +20,7 @@ public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRela
     PageUtils queryPage(Map<String, Object> params);
 
     void deleteBatchRelation(List<AttrAttrgroupRelationEntity> entities);
+
+    void saveBatch(List<AttrGroupRelationVO> vos);
 }
 
