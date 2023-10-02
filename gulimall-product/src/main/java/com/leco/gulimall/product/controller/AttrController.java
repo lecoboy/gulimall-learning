@@ -74,8 +74,8 @@ public class AttrController {
      */
     @RequestMapping("/update")
     //@RequiresPermissions("product:attr:update")
-    public R update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
+    public R update(@RequestBody AttrVO attr) {
+        attrService.updateAttrById(attr);
 
         return R.ok();
     }

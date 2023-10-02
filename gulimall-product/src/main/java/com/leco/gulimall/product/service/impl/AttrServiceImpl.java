@@ -1,6 +1,7 @@
 package com.leco.gulimall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leco.gulimall.common.utils.PageUtils;
@@ -19,6 +20,7 @@ import com.leco.gulimall.product.vo.AttrVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -46,6 +48,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         return new PageUtils(page);
     }
 
+    @Transactional
     @Override
     public void saveAttr(AttrVO attr) {
         AttrEntity attrEntity = new AttrEntity();
@@ -151,6 +154,31 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         }
 
         return respVo;
+    }
+
+    @Transactional
+    @Override
+    public void updateAttrById(AttrVO attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attr,attrEntity);
+
+        this.updateById(attrEntity);
+
+        if (attrEntity.getAttrType() == 1) {
+            //1、修改分组关联
+            AttrAttrgroupRelationEntity relationEntity = new AttrAttrgroupRelationEntity();
+            relationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+            int count = relationService.count(new QueryWrapper<AttrAttrgroupRelationEntity>()
+                    .eq("attr_id", attr.getAttrId()));
+
+            if (count > 0) {
+                relationService.update(relationEntity,
+                        new UpdateWrapper<AttrAttrgroupRelationEntity>().eq("attr_id",attr.getAttrId()));
+            } else {
+                relationService.save(relationEntity);
+            }
+        }
     }
 
 }
