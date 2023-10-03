@@ -3,14 +3,17 @@ package com.leco.gulimall.product.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.R;
+import com.leco.gulimall.product.entity.BrandEntity;
 import com.leco.gulimall.product.entity.CategoryBrandRelationEntity;
 import com.leco.gulimall.product.service.CategoryBrandRelationService;
+import com.leco.gulimall.product.vo.BrandVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -35,6 +38,27 @@ public class CategoryBrandRelationController {
         PageUtils page = categoryBrandRelationService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    /**
+     * /product/categorybrandrelation/brands/list
+     * 1、Controller：处理请求，接收和效验数据
+     * 2、Service接收Controller传来的数据，进行业务处理
+     * 3、Controller接收Service处理完的数据，封装页面指定的vo
+     */
+    @GetMapping(value = "/brands/list")
+    public R relationBrandsList(@RequestParam(value = "catId") Long catId) {
+
+        List<BrandEntity> vos = categoryBrandRelationService.getBrandsByCatId(catId);
+
+        List<BrandVO> collect = vos.stream().map(item -> {
+            BrandVO brandVo = new BrandVO();
+            brandVo.setBrandId(item.getBrandId());
+            brandVo.setBrandName(item.getName());
+            return brandVo;
+        }).collect(Collectors.toList());
+
+        return R.ok().put("data",collect);
     }
 
     /**
