@@ -3,6 +3,7 @@ package com.leco.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.product.entity.SpuInfoEntity;
+import com.leco.gulimall.product.vo.SpuSaveVO;
 
 import java.util.Map;
 
@@ -16,5 +17,7 @@ import java.util.Map;
 public interface SpuInfoService extends IService<SpuInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    void saveSpuInfo(SpuSaveVO vo);
 }
 
