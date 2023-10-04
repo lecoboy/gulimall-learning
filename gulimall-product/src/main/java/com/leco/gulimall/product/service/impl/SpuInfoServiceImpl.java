@@ -95,7 +95,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         productAttrValueService.saveProductAttr(collect);
 
 
-        //TODO 5、保存spu的积分信息：gulimall_sms--->sms_spu_bounds
+        //5、保存spu的积分信息：gulimall_sms--->sms_spu_bounds
         Bounds bounds = vo.getBounds();
         SpuBoundTO spuBoundTo = new SpuBoundTO();
         BeanUtils.copyProperties(bounds,spuBoundTo);
@@ -154,7 +154,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
                 skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
 
-                //TODO 5、4）、sku的优惠、满减等信息：gulimall_sms--->sms_sku_ladder、sms_sku_full_reduction、sms_member_price
+                //5、4）、sku的优惠、满减等信息：gulimall_sms--->sms_sku_ladder、sms_sku_full_reduction、sms_member_price
                 SkuReductionTO skuReductionTo = new SkuReductionTO();
                 BeanUtils.copyProperties(item,skuReductionTo);
                 skuReductionTo.setSkuId(skuId);
