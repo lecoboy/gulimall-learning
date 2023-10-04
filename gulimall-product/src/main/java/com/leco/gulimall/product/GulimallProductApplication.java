@@ -3,6 +3,7 @@ package com.leco.gulimall.product;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * 1、整合MyBatis-Plus
@@ -20,9 +21,9 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  *              1）、使用@MapperScan
  *              2）、告诉MyBatis-Plus，sql映射文件位置
  */
-
-//@MapperScan("com.leco.gulimall.product.dao")
+@EnableFeignClients(basePackages = "com.leco.gulimall.product.feign")
 @EnableDiscoveryClient
+//@MapperScan("com.leco.gulimall.product.dao")
 @SpringBootApplication(scanBasePackages = {"com.leco.gulimall"})
 public class GulimallProductApplication {
 

@@ -5,11 +5,7 @@ import java.util.Map;
 
 import com.leco.gulimall.product.vo.SpuSaveVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.leco.gulimall.product.entity.SpuInfoEntity;
 import com.leco.gulimall.product.service.SpuInfoService;
@@ -57,7 +53,7 @@ public class SpuInfoController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     //@RequiresPermissions("product:spuinfo:save")
     public R save(@RequestBody SpuSaveVO vo){
         //spuInfoService.save(spuInfo);
