@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * 1、整合MyBatis-Plus
@@ -22,6 +23,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *              2）、告诉MyBatis-Plus，sql映射文件位置
  */
 @EnableFeignClients(basePackages = "com.leco.gulimall.product.feign")
+@EnableTransactionManagement
 @EnableDiscoveryClient
 //@MapperScan("com.leco.gulimall.product.dao")
 @SpringBootApplication(scanBasePackages = {"com.leco.gulimall"})
