@@ -145,6 +145,7 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
         });
     }
 
+    @Transactional
     @Override
     public void done(PurchaseDoneVO doneVo) {
         Long id = doneVo.getId();
