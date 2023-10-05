@@ -3,6 +3,7 @@ package com.leco.gulimall.ware.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.leco.gulimall.ware.vo.MergeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,20 @@ public class PurchaseController {
     //@RequiresPermissions("ware:purchase:save")
     public R save(@RequestBody PurchaseEntity purchase){
 		purchaseService.save(purchase);
+
+        return R.ok();
+    }
+
+    /**
+     * 合并整单
+     * @param mergeVo
+     * @return
+     */
+    ///ware/purchase/merge
+    @PostMapping(value = "/merge")
+    public R merge(@RequestBody MergeVO mergeVo) {
+
+        purchaseService.mergePurchase(mergeVo);
 
         return R.ok();
     }

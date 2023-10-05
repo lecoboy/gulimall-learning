@@ -3,6 +3,7 @@ package com.leco.gulimall.ware.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.ware.entity.PurchaseEntity;
+import com.leco.gulimall.ware.vo.MergeVO;
 
 import java.util.Map;
 
@@ -18,5 +19,7 @@ public interface PurchaseService extends IService<PurchaseEntity> {
     PageUtils queryPage(Map<String, Object> params);
 
     PageUtils queryPageUnreceive(Map<String, Object> params);
+
+    void mergePurchase(MergeVO mergeVo);
 }
 
