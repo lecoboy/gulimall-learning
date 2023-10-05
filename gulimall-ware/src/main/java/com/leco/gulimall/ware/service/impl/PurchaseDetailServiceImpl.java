@@ -30,7 +30,7 @@ public class PurchaseDetailServiceImpl extends ServiceImpl<PurchaseDetailDao, Pu
         }
 
         String status = (String) params.get("status");
-        if (!StringUtils.isEmpty(status) && !"0".equalsIgnoreCase(status)) {
+        if (!StringUtils.isEmpty(status)) {
             queryWrapper.eq("status", status);
         }
 
