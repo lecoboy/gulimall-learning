@@ -69,18 +69,35 @@ public class PurchaseServiceImpl extends ServiceImpl<PurchaseDao, PurchaseEntity
             //获取新建采购单的id
             purchaseId = purchaseEntity.getId();
 
+        } else {
+            PurchaseEntity purchase = this.getById(purchaseId);
+            // 采购需求只能合并到新建和已分配的采购单
+            if (!(purchase.getStatus() == WareConstant.PurchaseStatusEnum.CREATED.getCode()
+                    || purchase.getStatus() == WareConstant.PurchaseStatusEnum.ASSIGNED.getCode())) {
+                throw new IllegalArgumentException("采购需求只能合并到新建和已分配的采购单");
+            }
         }
 
         List<Long> items = mergeVo.getItems();
 
+        // 只有新建和已分配的采购需求可以被合并
+        purchaseDetailService.listByIds(items).forEach(e -> {
+            if (!(e.getStatus() == WareConstant.PurchaseDetailStatusEnum.CREATED.getCode()
+                    || e.getStatus() == WareConstant.PurchaseDetailStatusEnum.ASSIGNED.getCode())) {
+                throw new IllegalArgumentException("只有新建和已分配的采购需求可以被合并");
+            }
+        });
+
         Long finalPurchaseId = purchaseId;
-        List<PurchaseDetailEntity> collect = items.stream().map(i -> {
-            PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
-            purchaseDetailEntity.setId(i);
-            purchaseDetailEntity.setPurchaseId(finalPurchaseId);
-            purchaseDetailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.ASSIGNED.getCode());
-            return purchaseDetailEntity;
-        }).collect(Collectors.toList());
+
+        List<PurchaseDetailEntity> collect = items.stream()
+                .map(i -> {
+                    PurchaseDetailEntity purchaseDetailEntity = new PurchaseDetailEntity();
+                    purchaseDetailEntity.setId(i);
+                    purchaseDetailEntity.setPurchaseId(finalPurchaseId);
+                    purchaseDetailEntity.setStatus(WareConstant.PurchaseDetailStatusEnum.ASSIGNED.getCode());
+                    return purchaseDetailEntity;
+                }).collect(Collectors.toList());
 
         //批量修改
         purchaseDetailService.updateBatchById(collect);
