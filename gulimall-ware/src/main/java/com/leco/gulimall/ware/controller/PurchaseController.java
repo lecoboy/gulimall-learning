@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.leco.gulimall.ware.vo.MergeVO;
+import com.leco.gulimall.ware.vo.PurchaseDoneVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import com.leco.gulimall.ware.service.PurchaseService;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.R;
 
+import javax.validation.Valid;
 
 
 /**
@@ -93,6 +95,19 @@ public class PurchaseController {
     public R received(@RequestBody List<Long> ids) {
 
         purchaseService.received(ids);
+
+        return R.ok();
+    }
+
+    /**
+     * 完成采购单
+     * @param doneVo
+     * @return
+     */
+    @PostMapping(value = "/done")
+    public R finish(@Valid @RequestBody PurchaseDoneVO doneVo) {
+
+        purchaseService.done(doneVo);
 
         return R.ok();
     }
