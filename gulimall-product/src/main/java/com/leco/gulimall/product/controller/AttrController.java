@@ -3,13 +3,16 @@ package com.leco.gulimall.product.controller;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.R;
 import com.leco.gulimall.product.entity.AttrEntity;
+import com.leco.gulimall.product.entity.ProductAttrValueEntity;
 import com.leco.gulimall.product.service.AttrService;
+import com.leco.gulimall.product.service.ProductAttrValueService;
 import com.leco.gulimall.product.vo.AttrRespVO;
 import com.leco.gulimall.product.vo.AttrVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,6 +28,8 @@ import java.util.Map;
 public class AttrController {
     @Autowired
     private AttrService attrService;
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
 
     @GetMapping("/{attrType}/list/{catelogId}")
     public R baseAttrList(@RequestParam Map<String, Object> params,
@@ -33,6 +38,17 @@ public class AttrController {
 
         PageUtils page = attrService.queryBaseAttrPage(params, catelogId, type);
         return R.ok().put("page", page);
+    }
+
+    /**
+     * 查询spu规格
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseAttrlistforspu(@PathVariable("spuId") Long spuId) {
+
+        List<ProductAttrValueEntity> entities = productAttrValueService.baseAttrListforspu(spuId);
+
+        return R.ok().put("data", entities);
     }
 
     /**

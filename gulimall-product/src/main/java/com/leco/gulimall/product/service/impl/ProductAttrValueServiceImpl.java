@@ -1,18 +1,17 @@
 package com.leco.gulimall.product.service.impl;
 
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.Query;
-
 import com.leco.gulimall.product.dao.ProductAttrValueDao;
 import com.leco.gulimall.product.entity.ProductAttrValueEntity;
 import com.leco.gulimall.product.service.ProductAttrValueService;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 
 @Service("productAttrValueService")
@@ -31,6 +30,12 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
     @Override
     public void saveProductAttr(List<ProductAttrValueEntity> collect) {
         this.saveBatch(collect);
+    }
+
+    @Override
+    public List<ProductAttrValueEntity> baseAttrListforspu(Long spuId) {
+        return this.baseMapper.selectList(
+                new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
     }
 
 }
