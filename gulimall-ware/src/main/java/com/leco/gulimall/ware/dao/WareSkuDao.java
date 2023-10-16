@@ -1,9 +1,12 @@
 package com.leco.gulimall.ware.dao;
 
+import com.leco.gulimall.ware.dto.SkuStockDTO;
 import com.leco.gulimall.ware.entity.WareSkuEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 商品库存
@@ -16,4 +19,6 @@ import org.apache.ibatis.annotations.Param;
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
 
     void addStock(@Param("skuId") Long skuId, @Param("wareId") Long wareId, @Param("skuNum") Integer skuNum);
+
+    List<SkuStockDTO> getSkuStocks(@Param("skuIds") List<Long> skuIds);
 }

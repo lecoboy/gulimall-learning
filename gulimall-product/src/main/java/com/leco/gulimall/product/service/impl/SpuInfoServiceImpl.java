@@ -3,14 +3,18 @@ package com.leco.gulimall.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.leco.gulimall.common.constant.ProductConstant;
 import com.leco.gulimall.common.to.SkuReductionTO;
 import com.leco.gulimall.common.to.SpuBoundTO;
+import com.leco.gulimall.common.to.es.SkuEsModel;
 import com.leco.gulimall.common.utils.PageUtils;
 import com.leco.gulimall.common.utils.Query;
 import com.leco.gulimall.common.utils.R;
 import com.leco.gulimall.product.dao.SpuInfoDao;
 import com.leco.gulimall.product.entity.*;
 import com.leco.gulimall.product.feign.CouponFeignService;
+import com.leco.gulimall.product.feign.SearchFeignService;
+import com.leco.gulimall.product.feign.WareFeignService;
 import com.leco.gulimall.product.service.*;
 import com.leco.gulimall.product.vo.*;
 import org.apache.commons.lang.StringUtils;
@@ -20,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -45,6 +47,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     private SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
     private CouponFeignService couponFeignService;
+    @Autowired
+    private WareFeignService wareFeignService;
+    @Autowired
+    private BrandService brandService;
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -98,7 +108,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //5、保存spu的积分信息：gulimall_sms--->sms_spu_bounds
         Bounds bounds = vo.getBounds();
         SpuBoundTO spuBoundTo = new SpuBoundTO();
-        BeanUtils.copyProperties(bounds,spuBoundTo);
+        BeanUtils.copyProperties(bounds, spuBoundTo);
         spuBoundTo.setSpuId(spuInfoEntity.getId());
         R r = couponFeignService.saveSpuBounds(spuBoundTo);
 
@@ -156,7 +166,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
                 //5、4）、sku的优惠、满减等信息：gulimall_sms--->sms_sku_ladder、sms_sku_full_reduction、sms_member_price
                 SkuReductionTO skuReductionTo = new SkuReductionTO();
-                BeanUtils.copyProperties(item,skuReductionTo);
+                BeanUtils.copyProperties(item, skuReductionTo);
                 skuReductionTo.setSkuId(skuId);
                 if (skuReductionTo.getFullCount() > 0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
                     R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
@@ -176,27 +186,118 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         String key = (String) params.get("key");
         if (!StringUtils.isEmpty(key)) {
-            queryWrapper.and((wrapper) -> wrapper.eq("id",key).or().like("spu_name",key));
+            queryWrapper.and((wrapper) -> wrapper.eq("id", key).or().like("spu_name", key));
         }
 
         String status = (String) params.get("status");
         if (!StringUtils.isEmpty(status)) {
-            queryWrapper.eq("publish_status",status);
+            queryWrapper.eq("publish_status", status);
         }
 
         String brandId = (String) params.get("brandId");
         if (!StringUtils.isEmpty(brandId) && !"0".equalsIgnoreCase(brandId)) {
-            queryWrapper.eq("brand_id",brandId);
+            queryWrapper.eq("brand_id", brandId);
         }
 
         String catelogId = (String) params.get("catelogId");
         if (!StringUtils.isEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)) {
-            queryWrapper.eq("catalog_id",catelogId);
+            queryWrapper.eq("catalog_id", catelogId);
         }
 
         IPage<SpuInfoEntity> page = this.page(new Query<SpuInfoEntity>().getPage(params), queryWrapper);
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void up(Long spuId) {
+        List<SkuInfoEntity> skuInfoEntities = skuInfoService.getSkusBySpuId(spuId);
+
+        List<ProductAttrValueEntity> baseAttrs = productAttrValueService.baseAttrListforspu(spuId);
+
+        List<Long> attrIds = baseAttrs.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
+
+        List<Long> searchAttrIds = attrService.selectSearchAttrs(attrIds);
+        // 转换为Set集合
+        Set<Long> idSet = new HashSet<>(searchAttrIds);
+
+        List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> idSet.contains(item.getAttrId())).map(item -> {
+            SkuEsModel.Attrs attrs = new SkuEsModel.Attrs();
+            BeanUtils.copyProperties(item, attrs);
+            return attrs;
+        }).collect(Collectors.toList());
+
+        List<Long> skuIdList = skuInfoEntities.stream()
+                .map(SkuInfoEntity::getSkuId)
+                .collect(Collectors.toList());
+
+        Map<Integer, Boolean> stockMap = null;
+        try {
+            R skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
+            if (skuHasStock.get("data") != null) {
+                //TODO 利用泛型优化R代码
+                /*
+                 * List<SkuHasStockTO>在ware服务里被put(data,vos)到map里，ware服务在发送数据时会把data里的数据
+                 * 转换成json，而feign在接收到这些json数据后，根本不可能知道他的类型是List<SkuHasStockTO>，
+                 * 所以(List<SkuHasStockTO>)skuHasStock.get("data")是有问题的，而实际上SkuHasStockTO被转成了LinkedHashMap。
+                 * 而且Long类型的skuId在经历了转json再转map的过程中，变成了Integer，这是有问题的所以利用Map来传输数据这种偷懒的方式，
+                 * 是存在问题的。
+                 * 还是利用泛型告知传输数据的类型是比较好的方式。
+                 */
+//                List<SkuHasStockTO> skuHasStockList = (List<SkuHasStockTO>)skuHasStock.get("data");
+//                stockMap = skuHasStockList.stream()
+//                        .collect(Collectors.toMap(SkuHasStockTO::getSkuId, SkuHasStockTO::getHasStock));
+                List<Map<String, Object>> skuHasStockList = (List<Map<String, Object>>)skuHasStock.get("data");
+                stockMap = skuHasStockList.stream()
+                        .collect(Collectors.toMap(e -> (Integer)e.get("skuId"), e -> (Boolean) e.get("hasStock")));
+            }
+        } catch (Exception e) {
+            log.error("库存服务查询异常, 原因: ", e);
+        }
+
+        // 封装每个sku的信息
+        Map<Integer, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> collect = skuInfoEntities.stream().map(sku -> {
+            // 组装需要的数据
+            SkuEsModel esModel = new SkuEsModel();
+            esModel.setSkuPrice(sku.getPrice());
+            esModel.setSkuImg(sku.getSkuDefaultImg());
+
+            // 设置库存信息
+            if (finalStockMap == null) {
+                esModel.setHasStock(false);
+            } else {
+                esModel.setHasStock(finalStockMap.get(Integer.parseInt(sku.getSkuId() + "")));
+            }
+
+            esModel.setHotScore(0L);
+
+            BrandEntity brandEntity = brandService.getById(sku.getBrandId());
+            esModel.setBrandName(brandEntity.getName());
+            esModel.setBrandId(brandEntity.getBrandId());
+            esModel.setBrandImg(brandEntity.getLogo());
+
+            CategoryEntity categoryEntity = categoryService.getById(sku.getCatalogId());
+            esModel.setCatalogId(categoryEntity.getCatId());
+            esModel.setCatalogName(categoryEntity.getName());
+
+            // 设置检索属性
+            esModel.setAttrs(attrsList);
+
+            BeanUtils.copyProperties(sku, esModel);
+
+            return esModel;
+        }).collect(Collectors.toList());
+
+        R r = searchFeignService.productStatusUp(collect);
+
+        if (r.getCode() == 0) {
+            // 远程调用成功
+            this.baseMapper.updateSpuStatus(spuId, ProductConstant.ProductStatusEnum.SPU_UP.getCode());
+        } else {
+            // 远程调用失败
+            //TODO 重复调用？接口幂等性；重试机制
+        }
     }
 
     private void saveBaseSpuInfo(SpuInfoEntity spuInfoEntity) {

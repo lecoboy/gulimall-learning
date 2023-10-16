@@ -1,14 +1,12 @@
 package com.leco.gulimall.ware.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.leco.gulimall.common.to.SkuHasStockTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.leco.gulimall.ware.entity.WareSkuEntity;
 import com.leco.gulimall.ware.service.WareSkuService;
@@ -51,6 +49,17 @@ public class WareSkuController {
 		WareSkuEntity wareSku = wareSkuService.getById(id);
 
         return R.ok().put("wareSku", wareSku);
+    }
+
+    /**
+     * 查询sku是否有库存
+     * @return
+     */
+    @PostMapping(value = "/hasStock")
+    public R getSkuHasStock(@RequestBody List<Long> skuIds) {
+        //skuId stock
+        List<SkuHasStockTO> vos = wareSkuService.getSkuHasStock(skuIds);
+        return R.ok().put("data", vos);
     }
 
     /**
