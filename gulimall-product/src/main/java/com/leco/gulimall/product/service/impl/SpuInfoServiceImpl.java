@@ -1,6 +1,5 @@
 package com.leco.gulimall.product.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -238,7 +237,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         try {
             R skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
             if (skuHasStock.get("data") != null) {
-                //TODO 利用泛型优化R代码
                 /*
                  * List<SkuHasStockTO>在ware服务里被put(data,vos)到map里，ware服务在发送数据时会把data里的数据
                  * 转换成json，而feign在接收到这些json数据后，根本不可能知道他的类型是List<SkuHasStockTO>，
@@ -250,7 +248,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 //                List<SkuHasStockTO> skuHasStockList = (List<SkuHasStockTO>)skuHasStock.get("data");
 //                stockMap = skuHasStockList.stream()
 //                        .collect(Collectors.toMap(SkuHasStockTO::getSkuId, SkuHasStockTO::getHasStock));
-                List<SkuHasStockTO> skuHasStockList = JSON.parseObject(JSON.toJSONString(skuHasStock.get("data")), new TypeReference<List<SkuHasStockTO>>() {
+                List<SkuHasStockTO> skuHasStockList = skuHasStock.getData(new TypeReference<List<SkuHasStockTO>>() {
                 });
                 stockMap = skuHasStockList.stream()
                         .collect(Collectors.toMap(SkuHasStockTO::getSkuId, SkuHasStockTO::getHasStock));
