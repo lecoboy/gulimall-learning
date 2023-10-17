@@ -1,55 +1,85 @@
 package io.renren.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 返回数据
- * 
- * @author chenshun
- * @email sunlightcs@gmail.com
- * @date 2016年10月27日 下午9:59:27
+ *
+ * @author greg
+ * @version 2023/10/17
  */
-public class R extends HashMap<String, Object> {
-	private static final long serialVersionUID = 1L;
-	
-	public R() {
-		put("code", 0);
-	}
-	
-	public static R error() {
-		return error(500, "未知异常，请联系管理员");
-	}
-	
-	public static R error(String msg) {
-		return error(500, msg);
-	}
-	
-	public static R error(int code, String msg) {
-		R r = new R();
-		r.put("code", code);
-		r.put("msg", msg);
-		return r;
-	}
+public class R<T> {
+    private int code;
+    private String msg = "";
+    private T data;
+    //TODO generator.js中使用的jqGrid，如果返回json里没有page字段数据就加载不出来，原因未知。先这样，R带入项目用时再删掉page字段和gettersetter
+    private T page;
 
-	public static R ok(String msg) {
-		R r = new R();
-		r.put("msg", msg);
-		return r;
-	}
-	
-	public static R ok(Map<String, Object> map) {
-		R r = new R();
-		r.putAll(map);
-		return r;
-	}
-	
-	public static R ok() {
-		return new R();
-	}
+    public R() {
+        this.code = 0;
+    }
 
-	public R put(String key, Object value) {
-		super.put(key, value);
-		return this;
-	}
+    public static <E> R<E> error() {
+        return error(500, "未知异常，请联系管理员");
+    }
+
+    public static <E> R<E> error(String msg) {
+        return error(500, msg);
+    }
+
+    public static <E> R<E> error(int code, String msg) {
+        R<E> r = new R<>();
+        r.code = code;
+        r.msg = msg;
+        return r;
+    }
+
+    public static <E> R<E> ok(String msg) {
+        R<E> r = new R<>();
+        r.msg = msg;
+        return r;
+    }
+
+    public static <E> R<E> ok(E data) {
+        R<E> r = new R<>();
+        r.data = data;
+        r.page = data;
+        return r;
+    }
+
+    public static <E> R<E> ok() {
+        return new R<>();
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    // generator.js中使用的jqGrid，如果返回json里没有page字段数据就加载不出来，原因未知。先这样，R带入项目用时再删掉page字段和gettersetter
+    public T getPage() {
+        return page;
+    }
+
+    // generator.js中使用的jqGrid，如果返回json里没有page字段数据就加载不出来，原因未知。先这样，R带入项目用时再删掉page字段和gettersetter
+    public void setPage(T page) {
+        this.page = page;
+    }
 }
