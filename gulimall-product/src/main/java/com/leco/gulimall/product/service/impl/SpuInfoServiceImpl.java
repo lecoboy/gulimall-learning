@@ -1,9 +1,12 @@
 package com.leco.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leco.gulimall.common.constant.ProductConstant;
+import com.leco.gulimall.common.to.SkuHasStockTO;
 import com.leco.gulimall.common.to.SkuReductionTO;
 import com.leco.gulimall.common.to.SpuBoundTO;
 import com.leco.gulimall.common.to.es.SkuEsModel;
@@ -231,7 +234,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 .map(SkuInfoEntity::getSkuId)
                 .collect(Collectors.toList());
 
-        Map<Integer, Boolean> stockMap = null;
+        Map<Long, Boolean> stockMap = null;
         try {
             R skuHasStock = wareFeignService.getSkuHasStock(skuIdList);
             if (skuHasStock.get("data") != null) {
@@ -247,16 +250,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 //                List<SkuHasStockTO> skuHasStockList = (List<SkuHasStockTO>)skuHasStock.get("data");
 //                stockMap = skuHasStockList.stream()
 //                        .collect(Collectors.toMap(SkuHasStockTO::getSkuId, SkuHasStockTO::getHasStock));
-                List<Map<String, Object>> skuHasStockList = (List<Map<String, Object>>)skuHasStock.get("data");
+                List<SkuHasStockTO> skuHasStockList = JSON.parseObject(JSON.toJSONString(skuHasStock.get("data")), new TypeReference<List<SkuHasStockTO>>() {
+                });
                 stockMap = skuHasStockList.stream()
-                        .collect(Collectors.toMap(e -> (Integer)e.get("skuId"), e -> (Boolean) e.get("hasStock")));
+                        .collect(Collectors.toMap(SkuHasStockTO::getSkuId, SkuHasStockTO::getHasStock));
             }
         } catch (Exception e) {
             log.error("库存服务查询异常, 原因: ", e);
         }
 
         // 封装每个sku的信息
-        Map<Integer, Boolean> finalStockMap = stockMap;
+        Map<Long, Boolean> finalStockMap = stockMap;
         List<SkuEsModel> collect = skuInfoEntities.stream().map(sku -> {
             // 组装需要的数据
             SkuEsModel esModel = new SkuEsModel();
@@ -267,7 +271,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             if (finalStockMap == null) {
                 esModel.setHasStock(false);
             } else {
-                esModel.setHasStock(finalStockMap.get(Integer.parseInt(sku.getSkuId() + "")));
+                esModel.setHasStock(finalStockMap.get(sku.getSkuId()));
             }
 
             esModel.setHotScore(0L);
