@@ -1,9 +1,12 @@
 package com.leco.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.google.common.collect.Lists;
 import com.leco.gulimall.product.service.CategoryBrandRelationService;
 import com.leco.gulimall.product.vo.Catelog2Vo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,10 +22,13 @@ import com.leco.gulimall.product.dao.CategoryDao;
 import com.leco.gulimall.product.entity.CategoryEntity;
 import com.leco.gulimall.product.service.CategoryService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
@@ -124,18 +130,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      */
     @Override
     public Map<String, List<Catelog2Vo>> getCatalogJson() {
+        String cacheCatalogs = stringRedisTemplate.opsForValue().get("getCatalogJson");
+        if (!StringUtils.isEmpty(cacheCatalogs)) {
+            return JSON.parseObject(cacheCatalogs, new TypeReference<Map<String, List<Catelog2Vo>>>(){});
+        }
 
         //将数据库的多次查询变为一次
         List<CategoryEntity> selectList = this.baseMapper.selectList(null);
 
+        // 分组
+        Map<Long, List<CategoryEntity>> childrenMap = selectList.stream().collect(Collectors.groupingBy(CategoryEntity::getParentCid));
+
         //1、查出所有分类
         //1、1）查出所有一级分类
-        List<CategoryEntity> level1Categorys = getParent_cid(selectList, 0L);
+//        List<CategoryEntity> level1Categorys = getParent_cid(selectList, 0L);
+        List<CategoryEntity> level1Categorys = childrenMap.get(0L);
 
         //封装数据
-        return level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+        Map<String, List<Catelog2Vo>> resultMap = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
             //1、每一个的一级分类,查到这个一级分类的二级分类
-            List<CategoryEntity> categoryEntities = getParent_cid(selectList, v.getCatId());
+            List<CategoryEntity> categoryEntities = childrenMap.get(v.getCatId());
 
             //2、封装上面的结果
             List<Catelog2Vo> catelog2Vos = null;
@@ -144,7 +158,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                     Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName().toString());
 
                     //1、找当前二级分类的三级分类封装成vo
-                    List<CategoryEntity> level3Catelog = getParent_cid(selectList, l2.getCatId());
+                    List<CategoryEntity> level3Catelog = childrenMap.get(l2.getCatId());
 
                     if (level3Catelog != null) {
                         List<Catelog2Vo.Category3Vo> category3Vos = level3Catelog.stream().map(l3 -> {
@@ -160,6 +174,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
             return catelog2Vos == null ? Lists.newArrayList() : catelog2Vos;
         }));
+        stringRedisTemplate.opsForValue().set("getCatalogJson", JSON.toJSONString(resultMap));
+        return resultMap;
     }
 
     private List<CategoryEntity> getParent_cid(List<CategoryEntity> selectList, long parentCid) {
