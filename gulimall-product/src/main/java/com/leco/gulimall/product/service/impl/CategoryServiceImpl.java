@@ -13,6 +13,8 @@ import com.leco.gulimall.product.entity.CategoryEntity;
 import com.leco.gulimall.product.service.CategoryBrandRelationService;
 import com.leco.gulimall.product.service.CategoryService;
 import com.leco.gulimall.product.vo.Catelog2Vo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -32,6 +34,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    private RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -132,20 +137,54 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             });
         }
         System.out.println("缓存未命中，准备查数据库。。。");
-        return getCatalogJsonWithRedis();
+        return getCatalogJsonWithRedisson();
     }
 
-    public Map<String, List<Catelog2Vo>> getCatalogJsonWithRedis() {
+    public Map<String, List<Catelog2Vo>> getCatalogJsonWithRedisson() {
+        RLock lock = redisson.getLock("com.leco.gulimall.product.service.impl.CategoryServiceImpl.getCatalogJsonWithRedisson-lock");
+        lock.lock();
+        Map<String, List<Catelog2Vo>> catalogs;
+        try {
+            catalogs = getCatalogJsonFromDb();
+        } finally {
+            lock.unlock();
+        }
+        return catalogs;
+
+    }
+
+    private void simpleWatchDog(Timer timer, String key, String value) {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                String script = "if (redis.call('get', KEYS[1])==ARGV[2]) then " +
+                        "redis.call('expire', KEYS[1], ARGV[1]); " +
+                        "return 1; " +
+                        "end; " +
+                        "return 0;";
+                Long ret = stringRedisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(key), "30", value);
+                System.out.println("续期..." + ret);
+            }
+        }, 10000, 10000);
+    }
+
+    private Map<String, List<Catelog2Vo>> getCatalogJsonWithRedis() {
+        String lockName = "com.leco.gulimall.product.service.impl.CategoryServiceImpl.getCatalogJsonWithRedis-lock";
         String uuid = UUID.randomUUID().toString();
-        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid, 300, TimeUnit.SECONDS);
+        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent(lockName, uuid, 30, TimeUnit.SECONDS);
         if (lock != null && lock) {
+            // 一个简单的锁续期逻辑
+            Timer timer = new Timer();
+            simpleWatchDog(timer, lockName, uuid);
+
             Map<String, List<Catelog2Vo>> catalogs;
             try {
                 catalogs = getCatalogJsonFromDb();
             } finally {
+                timer.cancel();
                 String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then return redis.call(\"del\",KEYS[1]) else return 0 end";
-                Long ret = stringRedisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList("lock"), uuid);
-                System.out.println(ret);
+                Long ret = stringRedisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList(lockName), uuid);
+                System.out.println("解锁..." + ret);
             }
             return catalogs;
         } else {
@@ -217,7 +256,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
             return catelog2Vos == null ? Lists.newArrayList() : catelog2Vos;
         }));
-        stringRedisTemplate.opsForValue().set("getCatalogJson", JSON.toJSONString(resultMap));
+        stringRedisTemplate.opsForValue().set("getCatalogJson", JSON.toJSONString(resultMap), 3600, TimeUnit.SECONDS);
         return resultMap;
     }
 
