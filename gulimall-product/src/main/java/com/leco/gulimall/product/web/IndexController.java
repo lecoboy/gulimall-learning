@@ -77,6 +77,7 @@ public class IndexController {
         try {
             //改数据加写锁，读数据加读锁
             rLock.lock();
+            System.out.println("写锁加锁成功" + Thread.currentThread().getId());
             s = UUID.randomUUID().toString();
             stringRedisTemplate.opsForValue().set("writeValue",s);
             TimeUnit.SECONDS.sleep(10);
@@ -84,6 +85,7 @@ public class IndexController {
             e.printStackTrace();
         } finally {
             rLock.unlock();
+            System.out.println("写锁释放" + Thread.currentThread().getId());
         }
 
         return s;
@@ -98,12 +100,14 @@ public class IndexController {
         RLock rLock = readWriteLock.readLock();
         try {
             rLock.lock();
+            System.out.println("读锁加锁成功" + Thread.currentThread().getId());
             s = stringRedisTemplate.opsForValue().get("writeValue");
-            try { TimeUnit.SECONDS.sleep(10); } catch (InterruptedException e) { e.printStackTrace(); }
+            TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             rLock.unlock();
+            System.out.println("读锁释放" + Thread.currentThread().getId());
         }
 
         return s;
