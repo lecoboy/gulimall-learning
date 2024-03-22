@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author greg
  * @version 2023/10/1
  **/
-@Configuration
-@EnableTransactionManagement
-@MapperScan("com.leco.gulimall.*.dao")
+//@Configuration
+//@EnableTransactionManagement
+//@MapperScan("com.leco.gulimall.*.dao")
 public class MyBatisConfig {
     @Bean
     public PaginationInterceptor paginationInterceptor() {

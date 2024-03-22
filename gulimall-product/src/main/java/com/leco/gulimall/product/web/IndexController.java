@@ -5,6 +5,7 @@ import com.leco.gulimall.product.service.CategoryService;
 import com.leco.gulimall.product.vo.Catelog2Vo;
 import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
+import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -111,5 +112,36 @@ public class IndexController {
         }
 
         return s;
+    }
+
+    /**
+     * 车库停车
+     * 3车位
+     * 信号量也可以做分布式限流
+     */
+    @GetMapping(value = "/park")
+    @ResponseBody
+    public String park() {
+
+        RSemaphore park = redisson.getSemaphore("park");
+//        park.acquire();//获取一个信号、获取一个值,占一个车位
+        boolean flag = park.tryAcquire();
+
+        if (!flag) {
+            return "error";
+        }
+
+        // 执行业务
+        // biz code ...
+
+        return "ok";
+    }
+
+    @GetMapping(value = "/go")
+    @ResponseBody
+    public String go() {
+        RSemaphore park = redisson.getSemaphore("park");
+        park.release();//释放一个车位
+        return "ok";
     }
 }
